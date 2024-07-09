@@ -38,18 +38,38 @@ public class WebServiceTest {
     }
 
     @Test
-    void shouldTest() throws InterruptedException {
+    void shouldTest() {
         driver.get("http://localhost:9999");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Мария Гамзина");
-        elements.get(1).sendKeys("+79260000000");
-        driver.findElement(By.className("checkbox__bo")).click();
+        driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иван Петров");
+        driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79003004050");
+        driver.findElement(By.cssSelector("[data-test-id=agreement]")).click();
         driver.findElement(By.className("button")).click();
-        String text = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText();
+        String text = driver.findElement(By.cssSelector("[data-test-id=order-success]")).getText();
         assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", text.trim());
-
-        Thread.sleep(5000);
-
-
     }
+
+    @Test
+    void shouldErrorName() {
+        driver.get("http://localhost:9999");
+        driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Eva Petrova");
+        driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79003004050");
+        driver.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        driver.findElement(By.className("button")).click();
+        String text = driver.findElement(By.className("input__sub")).getText();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", text.trim());
+    }
+
+
+    @Test
+    void shouldErrorPhone() {
+        driver.get("http://localhost:9999");
+        driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Иван Петров");
+        driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+7900300405011");
+        driver.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        driver.findElement(By.className("button")).click();
+        List<WebElement> sub = driver.findElements(By.className("input__sub"));
+        String text = sub.get(1).getText();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", text.trim());
+    }
+
 }
